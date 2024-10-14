@@ -1,0 +1,114 @@
+import math
+
+# Tic-Tac-Toe board
+board = [' ' for _ in range(9)]
+
+# Function to print the board
+def print_board():
+    print()
+    for row in [board[i*3:(i+1)*3] for i in range(3)]:
+        print('| ' + ' | '.join(row) + ' |')
+    print()
+
+# Function to check if the board is full
+def is_board_full():
+    return ' ' not in board
+
+# Function to check if a player has won
+def check_winner(player):
+    win_conditions = [(0, 1, 2), (3, 4, 5), (6, 7, 8), # Rows
+                      (0, 3, 6), (1, 4, 7), (2, 5, 8), # Columns
+                      (0, 4, 8), (2, 4, 6)]            # Diagonals
+    for condition in win_conditions:
+        if board[condition[0]] == board[condition[1]] == board[condition[2]] == player:
+            return True
+    return False
+
+# Minimax algorithm with alpha-beta pruning
+def minimax(is_maximizing):
+    # Base cases
+    if check_winner('O'):
+        return 1  # AI wins
+    elif check_winner('X'):
+        return -1  # Human wins
+    elif is_board_full():
+        return 0  # Tie
+
+    if is_maximizing:
+        best_score = -math.inf
+        for i in range(9):
+            if board[i] == ' ':
+                board[i] = 'O'  # AI move
+                score = minimax(False)
+                board[i] = ' '
+                best_score = max(score, best_score)
+        return best_score
+    else:
+        best_score = math.inf
+        for i in range(9):
+            if board[i] == ' ':
+                board[i] = 'X'  # Human move
+                score = minimax(True)
+                board[i] = ' '
+                best_score = min(score, best_score)
+        return best_score
+
+# AI chooses the best move using Minimax
+def ai_move():
+    best_score = -math.inf
+    move = None
+    for i in range(9):
+        if board[i] == ' ':
+            board[i] = 'O'  # AI move
+            score = minimax(False)
+            board[i] = ' '
+            if score > best_score:
+                best_score = score
+                move = i
+    board[move] = 'O'
+
+# Human move
+def human_move():
+    while True:
+        try:
+            move = int(input("Enter your move (1-9): ")) - 1
+            if board[move] == ' ':
+                board[move] = 'X'
+                break
+            else:
+                print("This spot is already taken.")
+        except (IndexError, ValueError):
+            print("Invalid move. Please choose a number between 1 and 9.")
+
+# Main game loop
+def play_game():
+    print("Welcome to Tic-Tac-Toe!")
+    print("You are 'X' and the AI is 'O'.")
+    print_board()
+
+    while True:
+        # Human move
+        human_move()
+        print_board()
+
+        if check_winner('X'):
+            print("Congratulations! You win!")
+            break
+        if is_board_full():
+            print("It's a tie!")
+            break
+
+        # AI move
+        ai_move()
+        print("AI has made its move:")
+        print_board()
+
+        if check_winner('O'):
+            print("AI wins! Better luck next time.")
+            break
+        if is_board_full():
+            print("It's a tie!")
+            break
+
+# Start the game
+play_game()f5
